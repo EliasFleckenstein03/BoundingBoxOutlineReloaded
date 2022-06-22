@@ -28,7 +28,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.gen.structure.Structure;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,9 +41,9 @@ public class CommonInterop {
     public static void chunkLoaded(WorldChunk chunk) {
         DimensionId dimensionId = DimensionId.from(chunk.getWorld().getRegistryKey());
         Map<String, StructureStart> structures = new HashMap<>();
-        final Registry<ConfiguredStructureFeature<?, ?>> structureFeatureRegistry = chunk.getWorld().getRegistryManager().get(Registry.CONFIGURED_STRUCTURE_FEATURE_KEY);
-        for (Map.Entry<ConfiguredStructureFeature<?, ?>, StructureStart> es : chunk.getStructureStarts().entrySet()) {
-            final Optional<RegistryKey<ConfiguredStructureFeature<?, ?>>> optional = structureFeatureRegistry.getKey(es.getKey());
+        final Registry<Structure> structureRegistry = chunk.getWorld().getRegistryManager().get(Registry.STRUCTURE_KEY);
+        for (Map.Entry<Structure, StructureStart> es : chunk.getStructureStarts().entrySet()) {
+            final Optional<RegistryKey<Structure>> optional = structureRegistry.getKey(es.getKey());
             optional.ifPresent(key -> structures.put(key.getValue().toString(), es.getValue()));
         }
         if (structures.size() > 0) EventBus.publish(new StructuresLoaded(structures, dimensionId));
@@ -57,9 +57,9 @@ public class CommonInterop {
     }
 
     public static void loadWorldStructures(World world) {
-        final Registry<ConfiguredStructureFeature<?, ?>> structureFeatureRegistry = world.getRegistryManager().get(Registry.CONFIGURED_STRUCTURE_FEATURE_KEY);
-        System.out.println("Registring structures: " + Arrays.toString(structureFeatureRegistry.getEntrySet().stream().map(entry -> entry.getKey().getValue().toString()).distinct().toArray(String[]::new)));
-        for (var entry : structureFeatureRegistry.getEntrySet()) {
+        final Registry<Structure> structureRegistry = world.getRegistryManager().get(Registry.STRUCTURE_KEY);
+        System.out.println("Registring structures: " + Arrays.toString(structureRegistry.getEntrySet().stream().map(entry -> entry.getKey().getValue().toString()).distinct().toArray(String[]::new)));
+        for (var entry : structureRegistry.getEntrySet()) {
             final Identifier value = entry.getKey().getValue();
             final BoundingBoxType boundingBoxType = BoundingBoxType.register("structure:" + value);
             StructureProcessor.registerSupportedStructure(boundingBoxType);

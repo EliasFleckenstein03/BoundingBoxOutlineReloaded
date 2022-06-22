@@ -8,6 +8,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.util.math.random.CheckedRandom;
 import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeKeys;
@@ -20,10 +22,9 @@ import net.minecraft.world.gen.stateprovider.BlockStateProvider;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class FlowerForestHelper {
-    private static final Random random = new Random();
+    private static final Random random = new CheckedRandom(new java.util.Random().nextLong());
 
     private static final Map<BlockState, Setting<HexColor>> flowerColorMap = new HashMap<>();
 

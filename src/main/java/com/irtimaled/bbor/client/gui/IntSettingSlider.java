@@ -3,7 +3,8 @@ package com.irtimaled.bbor.client.gui;
 import com.irtimaled.bbor.client.config.Setting;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +43,7 @@ class IntSettingSlider extends AbstractSlider {
 
     private void updateText() {
         Integer value = setting.get();
-        this.setMessage(new LiteralText(I18n.translate(format, displayValues.getOrDefault(value, value.toString()))));
+        this.setMessage(MutableText.of(new LiteralTextContent(I18n.translate(format, displayValues.getOrDefault(value, value.toString())))));
     }
 
     @Override

@@ -156,9 +156,9 @@ public class RenderBatch {
     static void endBatch() {
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         long startTime = System.nanoTime();
-        quadBufferBuilderMasked.end();
-        quadBufferBuilderNonMasked.end();
-        lineBufferBuilder.end();
+        BufferBuilder.BuiltBuffer quadBufferMasked = quadBufferBuilderMasked.end();
+        BufferBuilder.BuiltBuffer quadBufferNonMasked = quadBufferBuilderNonMasked.end();
+        BufferBuilder.BuiltBuffer lineBuffer = lineBufferBuilder.end();
 
         synchronized (mutex) {
             quadMaskedCountLast.set(quadMaskedCount.get());
@@ -170,11 +170,11 @@ public class RenderBatch {
         }
 
         RenderSystem.depthMask(true);
-        BufferRenderer.draw(quadBufferBuilderMasked);
-        BufferRenderer.draw(lineBufferBuilder);
+        BufferRenderer.drawWithShader(quadBufferMasked);
+        BufferRenderer.drawWithShader(lineBuffer);
 
         RenderSystem.depthMask(false);
-        BufferRenderer.draw(quadBufferBuilderNonMasked);
+        BufferRenderer.drawWithShader(quadBufferNonMasked);
         lastDurationNanos.set(System.nanoTime() - startTime);
 
         RenderSystem.depthMask(true);

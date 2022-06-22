@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,7 +39,7 @@ public class WorldSaveRow extends ControlListEntry implements Comparable<WorldSa
     private final Identifier iconLocation;
     private final NativeImageBackedTexture icon;
 
-    private File iconFile;
+    private Path iconPath;
     private long lastClickTime;
 
     WorldSaveRow(LevelSummary worldSummary, LevelStorage saveLoader, Consumer<ControlListEntry> setSelectedEntry) {
@@ -46,11 +47,8 @@ public class WorldSaveRow extends ControlListEntry implements Comparable<WorldSa
         this.saveLoader = saveLoader;
         this.setSelectedEntry = setSelectedEntry;
         this.client = MinecraftClient.getInstance();
-        this.iconLocation = new Identifier("worlds/" + Hashing.sha1().hashUnencodedChars(worldSummary.getName()) + "/icon");
-        this.iconFile = worldSummary.getFile();
-        if (!this.iconFile.isFile()) {
-            this.iconFile = null;
-        }
+        this.iconPath = worldSummary.getIconPath();
+        this.iconLocation = new Identifier(this.iconPath.toString());
 
         this.icon = this.loadIcon();
     }
@@ -96,18 +94,12 @@ public class WorldSaveRow extends ControlListEntry implements Comparable<WorldSa
     }
 
     private NativeImageBackedTexture loadIcon() {
-        if (this.iconFile == null || !this.iconFile.isFile()) {
-            this.client.getTextureManager().destroyTexture(this.iconLocation);
-            return null;
-        }
-
-        try (InputStream stream = new FileInputStream(this.iconFile)) {
+        try (InputStream stream = new FileInputStream(this.iconPath.toFile())) {
             NativeImageBackedTexture texture = new NativeImageBackedTexture(NativeImage.read(stream));
             this.client.getTextureManager().registerTexture(this.iconLocation, texture);
             return texture;
         } catch (Throwable exception) {
             LOGGER.error("Invalid icon for world {}", this.worldSummary.getName(), exception);
-            this.iconFile = null;
             return null;
         }
     }

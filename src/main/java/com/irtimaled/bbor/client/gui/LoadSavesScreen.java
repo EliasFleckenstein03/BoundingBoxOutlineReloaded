@@ -9,6 +9,7 @@ import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.world.level.storage.LevelSummary;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class LoadSavesScreen extends ListScreen {
     private SelectableControlList controlList;
@@ -26,10 +27,10 @@ public class LoadSavesScreen extends ListScreen {
         controlList = new SelectableControlList(this.width, this.height, top, bottom);
         try {
             final LevelStorage saveLoader = this.client.getLevelStorage();
-            List<LevelSummary> saveList = saveLoader.getLevelList();
+            List<LevelSummary> saveList = saveLoader.loadSummaries(saveLoader.getLevelList()).get();
             saveList.sort(null);
             saveList.forEach(world -> controlList.add(new WorldSaveRow(world, saveLoader, controlList::setSelectedEntry)));
-        } catch (LevelStorageException e) {
+        } catch (LevelStorageException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         return controlList;

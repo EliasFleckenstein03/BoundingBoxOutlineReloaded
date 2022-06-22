@@ -1,19 +1,21 @@
 package com.irtimaled.bbor.client.interop;
 
 import com.irtimaled.bbor.common.models.Coords;
-import com.irtimaled.bbor.mixin.access.IBiome;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.tag.BiomeTags;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeKeys;
 
 public class SpawnableBlocksHelper {
     private static final EntityType entityType = EntityType.Builder.create(SpawnGroup.MONSTER)
@@ -50,9 +52,10 @@ public class SpawnableBlocksHelper {
 
     static boolean isSpawnable(World world, BlockPos pos, BlockState spawnBlockState, BlockState upperBlockState) {
         VoxelShape collisionShape = upperBlockState.getCollisionShape(world, pos);
-        Biome biome = world.getBiome(pos).value();
-        boolean isNether = ((IBiome) biome).bbor$getCategory() == Biome.Category.NETHER;
-        return ((IBiome) biome).bbor$getCategory() != Biome.Category.MUSHROOM &&
+        RegistryEntry<Biome> entry = world.getBiome(pos);
+        Biome biome = entry.value();
+        boolean isNether = entry.isIn(BiomeTags.IS_NETHER);
+        return entry == BiomeKeys.MUSHROOM_FIELDS &&
                 spawnBlockState.allowsSpawning(world, pos.down(), isNether ? EntityType.ZOMBIFIED_PIGLIN : entityType) &&
                 !Block.isFaceFullSquare(collisionShape, Direction.UP) &&
                 !upperBlockState.emitsRedstonePower() &&

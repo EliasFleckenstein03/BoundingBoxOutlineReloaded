@@ -5,11 +5,12 @@ import com.mojang.brigadier.context.ParsedCommandNode;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.TranslatableTextContent;
 
 class CommandHelper {
     static void feedback(CommandContext<ServerCommandSource> context, String format, Object... values) {
-        context.getSource().sendFeedback(new TranslatableText(format, values), false);
+        context.getSource().sendFeedback(MutableText.of(new TranslatableTextContent(format, values)), false);
     }
 
     static boolean lastNodeIsLiteral(CommandContext<ServerCommandSource> context, String literal) {
